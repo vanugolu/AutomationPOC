@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="AIMS_Automation_Parallel" parallel="tests"
+	thread-count="5">
+	
+	<test name="Driver">
+		<classes>
+			<class name="com.rbc.Driver"></class>
+		</classes>
+	</test>
+
+	<test name="alfresco">
+		<parameter name="moduleName" value="alfresco" />
+		<classes>
+			<class name="com.rbc.TestDriver"></class>
+		</classes>
+	</test> 
+	
+</suite>

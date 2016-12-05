@@ -1,0 +1,7 @@
+[0419/172744:INFO:chromedriver_server.cc(76)] Handling request: /status 
+[0419/172744:INFO:chromedriver_server.cc(81)] Done handling request: 200 {"sessionId":"","status":0,"value":{"build":{"version":"alpha"},"os":{"arch":"x86_64","name":"Windows NT","version":"6.1 SP1"}}}
+[0419/172744:INFO:chromedriver_server.cc(76)] Handling request: /session {"desiredCapabilities":{"platform":"WINDOWS","chrome.binary":"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe","browserName":"chrome","chromeOptions":{"args":["start-maximized"],"extensions":[]},"version":""}}
+[0419/172744:INFO:chrome_launcher.cc(74)] Using chrome from C:\Users\sanug1\AppData\Local\Google\Chrome\Application\chrome.exe
+[0419/172805:INFO:chromedriver_server.cc(81)] Done handling request: 200 {"sessionId":"","status":13,"value":{"message":"unknown error: Chrome failed to start: crashed\n  (Driver info: chromedriver=0.7,platform=Windows NT 6.1 SP1 x86_64)"}}
+[0419/172805:INFO:chromedriver_server.cc(76)] Handling request: /shutdown 
+[0419/172805:INFO:chromedriver_server.cc(81)] Done handling request: 200 {"sessionId":"","status":0,"value":null}
