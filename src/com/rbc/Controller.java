@@ -1,5 +1,6 @@
 package com.rbc;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -12,11 +13,13 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import com.rbc.report.ModuleStats;
+import com.rbc.report.ModuleTestCasesStats;
+import com.rbc.report.TestStepStats;
 import com.rbc.util.DurationTracker;
 import com.rbc.util.Functions;
 import com.rbc.util.ReportsUtil;
 import com.rbc.xls.ExcelOperations;
-import com.rbc.report.*;
 
 public class Controller extends Keywords {
 	String result = "false";
@@ -88,6 +91,7 @@ public class Controller extends Keywords {
 
 		// initialize test data excel file
 		if (fileName.contains("TestData") && testDatafileAssigned == false) {
+			
 
 			log.debug("test data  file : " + fileName);
 			testData = new ExcelOperations(srcFolder + modules[0] + "/" + fileName);
@@ -147,69 +151,97 @@ public class Controller extends Keywords {
 
 			// initialize start time of test
 			if (controller.getCellData(modules[0], "Runmode", tcid).equals("Y") && !flagNavigationError) {
-
-				testCasesStats = new ModuleTestCasesStats();
-				testCaseDurationTracker = new DurationTracker();
-				testCaseDurationTracker.startTime();
-				testCasesStats.setSequenceId(testSequenceId++);
-				testCasesStats.setTestCaseDescription(currentTest + " -" + currentTest_Description);
-				fileName = getTestCaseFileName(testCasesStats.getTestCaseDescription(), tcid);
-				fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1, fileName.length());
-
-				if (isSmokeTest) {
-
-					if (controller.getCellData(modules[0], smokeTest, tcid).equals("Y")) {
+				int totalSets = testData.getRowCount(currentTest); // holds total rows
+				// TestData sheet.
+				// If sheet does not
+				// exist then 2 by
+				// default
+				if (totalSets >= 2) {
+					totalSets = 2; // run at least once
+				}
+				int stepSequenceId = 1;
+				for (testRepeat = totalSets; testRepeat <= testData.getRowCount(currentTest); testRepeat++) {
+					
+					log.debug("Executing the test :                                " + currentTest);
+					log.debug("Test Description :    " + currentTest_Description);
+					log.debug("test repeat : " + totalSets);
+					
+					if (testRepeat > 2)
+						Thread.sleep(2000);
+					testCasesStats = new ModuleTestCasesStats();
+					testCaseDurationTracker = new DurationTracker();
+					testCaseDurationTracker.startTime();
+					testCasesStats.setSequenceId(testSequenceId++);
+					testCasesStats.setTestCaseDescription(currentTest + " -" + currentTest_Description);
+					fileName = getTestCaseFileName(testCasesStats.getTestCaseDescription(), tcid);
+					fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1, fileName.length());
+					
+					if (isSmokeTest) {
+						
+						if (controller.getCellData(modules[0], smokeTest, tcid).equals("Y")) {
+							System.out.println("### " + modules[0] + ": Test Case: " + currentTest);
+							testCaseMappingDescription = executeTest("Runmode", currentTest_Mapping, testCaseMappingDescription, tcid, stepSequenceId);
+							testCaseExecuted = true;
+						}
+						// else {
+						// testCaseMappingDescription =
+						// skipTestCase(currentTest_Mapping);
+						// }
+					} else {
 						System.out.println("### " + modules[0] + ": Test Case: " + currentTest);
-						testCaseMappingDescription = executeTest("Runmode", currentTest_Mapping, testCaseMappingDescription, tcid);
+						testCaseMappingDescription = executeTest("Runmode", currentTest_Mapping, testCaseMappingDescription, tcid, stepSequenceId);
 						testCaseExecuted = true;
 					}
-					// else {
-					// testCaseMappingDescription =
-					// skipTestCase(currentTest_Mapping);
-					// }
-				} else {
-					System.out.println("### " + modules[0] + ": Test Case: " + currentTest);
-					testCaseMappingDescription = executeTest("Runmode", currentTest_Mapping, testCaseMappingDescription, tcid);
-					testCaseExecuted = true;
-				}
-
-				if (testCaseExecuted) {
-					if (!currentTest_Mapping.isEmpty() || currentTest_Mapping != null) {
-						set.addAll(Arrays.asList(currentTest_Mapping.split(",")));
-						manualSize = set.size();
+					stepSequenceId++;
+					if (testCaseExecuted) {
+						if (!currentTest_Mapping.isEmpty() || currentTest_Mapping != null) {
+							set.addAll(Arrays.asList(currentTest_Mapping.split(",")));
+							manualSize = set.size();
+						}
+						testCasesStats.setManualTCId(currentTest_Mapping);
+						if (stepstatus) {
+							testCasesStats.setResult("Pass");
+							passCount++;
+						} else {
+							testCasesStats.setResult("Fail");
+							failCount++;
+						}
+						
+						testCaseDurationTracker.endTime();
+						testCasesStats.setDurationTracker(testCaseDurationTracker);
+						testCasesStats.setTestCaseHyperLinkName(fileName);
+						moduleTestCasesStats.add(testCasesStats);
+						durationTracker.endTime();
+						testCaseExecuted = false;
+						
 					}
-					testCasesStats.setManualTCId(currentTest_Mapping);
-					if (stepstatus) {
-						testCasesStats.setResult("Pass");
-						passCount++;
-					} else {
-						testCasesStats.setResult("Fail");
-						failCount++;
+					if (result.contains("Domain Page not Found")) {
+						break;
 					}
 
-					testCaseDurationTracker.endTime();
-					testCasesStats.setDurationTracker(testCaseDurationTracker);
-					testCasesStats.setTestCaseHyperLinkName(fileName);
-					moduleTestCasesStats.add(testCasesStats);
-					durationTracker.endTime();
-					testCaseExecuted = false;
+					if (testStatus == null) {
+						testStatus = "Pass";
+					}
 
+					log.debug("****************************************************" + currentTest + " --- " + testStatus);
+					testStatus = null;
+					createReport(durationTracker, moduleTestCasesStats, passCount, failCount, skipCount, manualSize);
 				}
 
 			} else if (!(controller.getCellData(modules[0], "Runmode", tcid).equals("N"))) {
 				testCasesStats.setResult("Fail");
 				failCount++;
 				testCaseExecuted = false;
+				testStatus = null;
+				createReport(durationTracker, moduleTestCasesStats, passCount, failCount, skipCount, manualSize);
 			}
 			// else {
 			// testCaseMappingDescription = skipTestCase(currentTest_Mapping);
 			// }
-			testStatus = null;
-			createReport(durationTracker, moduleTestCasesStats, passCount, failCount, skipCount, manualSize);
-
 			if (result.contains("Domain Page not Found") && !flagNavigationError) {
 				flagNavigationError = true;
 			}
+
 		}
 	}
 
@@ -251,35 +283,17 @@ public class Controller extends Keywords {
 		return fileName;
 	}
 
-	public String executeTest(String runMode, String currentTest_Mapping, String testCaseMappingDescription, int tcid)
+	public String executeTest(String runMode, String currentTest_Mapping, String testCaseMappingDescription, int tcid, int stepSequenceId)
 			throws InterruptedException, IOException {
 		String isSmokeTestStep;
 		ArrayList<TestStepStats> testStepStats = new ArrayList<TestStepStats>();
 		int screenshotCount = 0;
 		userAgent = controller.getCellData(modules[0], "UserAgent", tcid);
-		String descriptionModified = "No";
 		stepstatus = true;
 		boolean testStepExecuted = false;
+		String descriptionModified = "No";
 		// execute the keywords
 		// loop again - rows in test data
-		int totalSets = testData.getRowCount(currentTest); // holds total rows
-															// TestData sheet.
-															// If sheet does not
-															// exist then 2 by
-															// default
-		if (totalSets >= 2) {
-			totalSets = 2; // run at least once
-		}
-
-		int stepSequenceId = 1;
-		for (testRepeat = totalSets; testRepeat <= testData.getRowCount(currentTest); testRepeat++) {
-
-			log.debug("Executing the test :                                " + currentTest);
-			log.debug("Test Description :    " + currentTest_Description);
-			log.debug("test repeat : " + totalSets);
-
-			if (testRepeat > 2)
-				Thread.sleep(2000);
 			for (int tsid = 2; tsid <= controller.getRowCount(currentTest); tsid++) {
 				String screenshot = null;
 				String stepDescription = null;
@@ -291,7 +305,7 @@ public class Controller extends Keywords {
 
 					if (!(!runTest.equals("sanitySuite") && isSmokeTestStep.equals("N"))) {
 						currentTSID = controller.getCellData(currentTest, "TSID", tsid);
-						stepDescription = controller.getCellData(currentTest, "Decription", tsid);
+						stepDescription = controller.getCellData(currentTest, "Description", tsid);
 						keyword = controller.getCellData(currentTest, "Keyword", tsid);
 						object = controller.getCellData(currentTest, "Object", tsid);
 						objectArr = object.split(",");
@@ -370,7 +384,7 @@ public class Controller extends Keywords {
 						testStepExecuted = true;
 					}
 					if (testStepExecuted) {
-						stepStats.setTestStepId(stepSequenceId++);
+						stepStats.setTestStepId(stepSequenceId);
 						stepStats.setTestStepDescription(stepDescription);
 						stepStats.setTestStepKeyword(keyword);
 						stepStats.setTestStepResult(result);
@@ -394,17 +408,6 @@ public class Controller extends Keywords {
 				}
 			}// keywords one loop over
 				// report pass or fail
-			if (result.contains("Domain Page not Found")) {
-				break;
-			}
-
-			if (testStatus == null) {
-				testStatus = "Pass";
-			}
-
-			log.debug("****************************************************" + currentTest + " --- " + testStatus);
-			descriptionModified = "No";
-		}// test data
 		String templatePath = "src" + File.separator + "templates" + File.separator + "testStepsReport.ftl";
 		Map<String, Object> testStepData = new HashMap<String, Object>();
 		File testCaseFile = new File(getTestCaseFileName(testCaseDescription, tcid));
