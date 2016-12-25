@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.rbc.report.ModuleStats;
 import com.rbc.report.ModuleTestCasesStats;
@@ -26,6 +27,7 @@ public class Controller extends Keywords {
 	ReportsUtil reportsUtil = new ReportsUtil();
 	ModuleStats moduleStats;
 	boolean stepstatus;
+	int testSequenceId = 1;
 
 	public Controller() {
 		super();
@@ -130,7 +132,7 @@ public class Controller extends Keywords {
 			isSmokeTest = true;
 
 		}
-		int testSequenceId = 1;
+		
 		durationTracker.startTime();
 		ReportsUtil.allModulesStats.add(moduleStats);
 		moduleStats.setModuleName(modules[0]);
@@ -151,30 +153,30 @@ public class Controller extends Keywords {
 
 			// initialize start time of test
 			if (controller.getCellData(modules[0], "Runmode", tcid).equals("Y") && !flagNavigationError) {
-				int totalSets = testData.getRowCount(currentTest); // holds total rows
+				int currentTestDataCount = testData.getRowCount(currentTest); // holds total rows
 				// TestData sheet.
 				// If sheet does not
 				// exist then 2 by
 				// default
-				if (totalSets >= 2) {
-					totalSets = 2; // run at least once
+				if (currentTestDataCount < 2) {
+					currentTestDataCount = 2; // run at least once
 				}
 				int stepSequenceId = 1;
-				for (testRepeat = totalSets; testRepeat <= testData.getRowCount(currentTest); testRepeat++) {
+				for (testRepeat = 2; testRepeat <= currentTestDataCount; testRepeat++) {
 					
+					//currentTest_Description = currentTest_Description +" datarow "+ testRepeat;// for more then 1 row of data 
 					log.debug("Executing the test :                                " + currentTest);
 					log.debug("Test Description :    " + currentTest_Description);
-					log.debug("test repeat : " + totalSets);
 					
-					if (testRepeat > 2)
-						Thread.sleep(2000);
 					testCasesStats = new ModuleTestCasesStats();
 					testCaseDurationTracker = new DurationTracker();
 					testCaseDurationTracker.startTime();
 					testCasesStats.setSequenceId(testSequenceId++);
-					testCasesStats.setTestCaseDescription(currentTest + " -" + currentTest_Description);
+					testCasesStats.setTestCaseDescription(currentTest + " -" + currentTest_Description+" datarow "+ testRepeat);
+					System.out.println(testCasesStats.getTestCaseDescription());
 					fileName = getTestCaseFileName(testCasesStats.getTestCaseDescription(), tcid);
 					fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1, fileName.length());
+					System.out.println(fileName);
 					
 					if (isSmokeTest) {
 						
@@ -229,8 +231,8 @@ public class Controller extends Keywords {
 				}
 
 			} else if (!(controller.getCellData(modules[0], "Runmode", tcid).equals("N"))) {
-				testCasesStats.setResult("Fail");
-				failCount++;
+				testCasesStats.setResult("Skip");
+				//failCount++;
 				testCaseExecuted = false;
 				testStatus = null;
 				createReport(durationTracker, moduleTestCasesStats, passCount, failCount, skipCount, manualSize);
@@ -278,8 +280,12 @@ public class Controller extends Keywords {
 
 	public String getTestCaseFileName(String testDescription, Integer testCaseId) {
 		String testCaseName = testDescription.replaceAll("[\"/:*?<>|\\\\]", "");
-		String fileName = System.getProperty("user.dir") + File.separator + reportFolder + File.separator + modules[0] + "_TC" + testCaseId
-				+ "_" + testCaseName.replaceAll(" ", "_") + ".html";
+		System.out.println(testCaseName);
+		/*String fileName = System.getProperty("user.dir") + File.separator + reportFolder + File.separator + modules[0] + "_TC" + testCaseId
+				+ "_" + testCaseName.replaceAll(" ", "_") + ".html";*/
+		String fileName = System.getProperty("user.dir") + File.separator + reportFolder + File.separator + modules[0] + "_" +testSequenceId + 
+				 "_" + testCaseName.replaceAll(" ", "_") + ".html";
+		System.out.println(fileName);
 		return fileName;
 	}
 
@@ -316,17 +322,17 @@ public class Controller extends Keywords {
 
 						proceedOnFail = controller.getCellData(currentTest, "ProceedOnFail", tsid);
 						data_column_name = controller.getCellData(currentTest, "Data_Column_Name", tsid);
-						data_column_nameArr = data_column_name.split(",");
 
-						if (!(data_column_name.equals(""))) {
+						if (StringUtils.isNotBlank(data_column_name)) {
+							data_column_nameArr = data_column_name.split(",");
 							data = testData.getCellData(currentTest, data_column_nameArr[0], testRepeat);
 							data = data.replaceAll("\\W+", "");
-							testCaseDescription = currentTest + " -" + currentTest_Description;
+							testCaseDescription = currentTest + " -" + currentTest_Description+" datarow "+ testRepeat;
 							testCaseMappingDescription = currentTest_Mapping;
 							descriptionModified = "Yes";
 						} else {
 							if (!(descriptionModified.equalsIgnoreCase("Yes")))
-								testCaseDescription = currentTest + " -" + currentTest_Description;
+								testCaseDescription = currentTest + " -" + currentTest_Description+" datarow "+ testRepeat;
 							testCaseMappingDescription = currentTest_Mapping;
 						}
 
@@ -365,7 +371,7 @@ public class Controller extends Keywords {
 								stepstatus = false;
 								testStatus = result;
 								// take screenshot for fail
-								screenshot = "alfresco_Portal_Module-" + modules[0] + "_TC" + tcid + "_TS" + currentTSID + "_"
+								screenshot = "RBC_Portal_Module-" + modules[0] + "_TC" + tcid + "_TS" + currentTSID + "_"
 										+ launchBrowser + ++screenshotCount + ".jpeg";
 
 								if (captureScreenShot.equals("true"))
