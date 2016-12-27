@@ -231,11 +231,12 @@ public class Controller extends Keywords {
 				}
 
 			} else if (!(controller.getCellData(modules[0], "Runmode", tcid).equals("N"))) {
-				testCasesStats.setResult("Skip");
+				//testCasesStats = new ModuleTestCasesStats();
+				//testCasesStats.setResult("Skip");
 				//failCount++;
 				testCaseExecuted = false;
 				testStatus = null;
-				createReport(durationTracker, moduleTestCasesStats, passCount, failCount, skipCount, manualSize);
+				//createReport(durationTracker, moduleTestCasesStats, passCount, failCount, skipCount, manualSize);
 			}
 			// else {
 			// testCaseMappingDescription = skipTestCase(currentTest_Mapping);
