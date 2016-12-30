@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.poi.common.usermodel.Hyperlink;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -703,5 +704,44 @@ public class ExcelOperations {
 		return true;
 	}
 	
+	public Date getDateFormattedCellData(String sheetName, String colName, int rowNum) {
+		try {
+			if (rowNum <= 0)
+				return null;
 
+			int index = workbook.getSheetIndex(sheetName);
+			int col_Num = -1;
+			if (index == -1)
+				return null;
+
+			sheet = workbook.getSheetAt(index);
+			row = sheet.getRow(0);
+			for (int i = 0; i < row.getLastCellNum(); i++) {
+				// System.out.println(row.getCell(i).getStringCellValue().trim());
+				if (row.getCell(i).getStringCellValue().trim()
+						.equals(colName.trim())){
+					col_Num = i;
+					break;
+				}
+			}
+			if (col_Num == -1)
+				return null;
+
+			sheet = workbook.getSheetAt(index);
+			row = sheet.getRow(rowNum - 1);
+			if (row == null)
+				return null;
+			cell = row.getCell(col_Num);
+
+			if (cell == null)
+				return null;
+			// System.out.println(cell.getCellType());
+			if (DateUtil.isCellDateFormatted(cell)) {
+				return cell.getDateCellValue();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }
