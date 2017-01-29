@@ -372,8 +372,8 @@ public class Controller extends Keywords {
 								stepstatus = false;
 								testStatus = result;
 								// take screenshot for fail
-								screenshot = "RBC_Portal_Module-" + modules[0] + "_TC" + tcid + "_TS" + currentTSID + "_"
-										+ launchBrowser + ++screenshotCount + ".jpeg";
+								//screenshot = "RBC_Portal_Module-" + modules[0] + "_TC" + tcid + "_TS" + currentTSID + "_" + launchBrowser + ++screenshotCount + ".jpeg";
+								screenshot = "RBC_Portal_Module-" + modules[0] + "_TC" + tcid + "_" +testSequenceId + currentTSID + "_" + stepSequenceId +"_" + launchBrowser + ++screenshotCount + ".jpeg";
 
 								if (captureScreenShot.equals("true"))
 									ReportsUtil.takeScreenShot(screenshot, driver, reportFolder, log);
