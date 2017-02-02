@@ -1,4 +1,4 @@
-package com.rbc;
+package com.poc;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,8 +9,8 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import com.rbc.util.CreateLogger;
-import com.rbc.util.Functions;
+import com.poc.util.CreateLogger;
+import com.poc.util.Functions;
 
 public class TestDriver extends Controller {
 	String moduleName;

@@ -1,4 +1,4 @@
-package com.rbc;
+package com.poc;
 
 
 import java.io.File;
@@ -14,13 +14,13 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.rbc.report.ModuleStats;
-import com.rbc.report.ModuleTestCasesStats;
-import com.rbc.report.TestStepStats;
-import com.rbc.util.DurationTracker;
-import com.rbc.util.Functions;
-import com.rbc.util.ReportsUtil;
-import com.rbc.xls.ExcelOperations;
+import com.poc.report.ModuleStats;
+import com.poc.report.ModuleTestCasesStats;
+import com.poc.report.TestStepStats;
+import com.poc.util.DurationTracker;
+import com.poc.util.Functions;
+import com.poc.util.ReportsUtil;
+import com.poc.xls.ExcelOperations;
 
 public class Controller extends Keywords {
 	String result = "false";

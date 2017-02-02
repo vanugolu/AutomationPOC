@@ -1,4 +1,4 @@
-package com.rbc.util;
+package com.poc.util;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -17,8 +17,8 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.rbc.Keywords;
-import com.rbc.report.ModuleStats;
+import com.poc.Keywords;
+import com.poc.report.ModuleStats;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;

@@ -1,6 +1,6 @@
-package com.rbc.report;
+package com.poc.report;
 
-import com.rbc.util.DurationTracker;
+import com.poc.util.DurationTracker;
 
 public class ModuleStats {
 

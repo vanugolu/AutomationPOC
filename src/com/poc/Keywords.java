@@ -1,4 +1,4 @@
-package com.rbc;
+package com.poc;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -42,8 +42,8 @@ import org.openqa.selenium.support.Color;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 
-import com.rbc.util.Functions;
-import com.rbc.xls.ExcelOperations;
+import com.poc.util.Functions;
+import com.poc.xls.ExcelOperations;
 
 public class Keywords {
 	public String version;

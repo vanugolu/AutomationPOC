@@ -1,4 +1,4 @@
-package com.rbc.util;
+package com.poc.util;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
@@ -26,7 +26,7 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.SkipException;
 
-import com.rbc.Controller;
+import com.poc.Controller;
 
 public class Functions extends Controller {
 

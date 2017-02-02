@@ -1,4 +1,4 @@
-package com.rbc;
+package com.poc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,9 +7,9 @@ import java.io.IOException;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
-import com.rbc.util.DurationTracker;
-import com.rbc.util.Functions;
-import com.rbc.util.ReportsUtil;
+import com.poc.util.DurationTracker;
+import com.poc.util.Functions;
+import com.poc.util.ReportsUtil;
 
 public class Driver extends Controller {
 

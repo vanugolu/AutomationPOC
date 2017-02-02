@@ -1,4 +1,4 @@
-package com.rbc.report;
+package com.poc.report;
 
 public class TestStepStats {
 	
